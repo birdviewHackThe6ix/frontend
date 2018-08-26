@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Home from './HomeComponent';
+import Journal from './JournalComponent';
 
-import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 class Main extends Component {
   render() {
@@ -13,7 +14,7 @@ class Main extends Component {
         <Switch>
           <Route path="/home" component={Home} />
           {/* <Route path="/report" component={Report} /> */}
-          {/* <Route path="/matches" component={Matches} /> */}
+          <Route path="/journal" component={Journal} />
           <Redirect to="/home" />
         </Switch>
         <Footer />
