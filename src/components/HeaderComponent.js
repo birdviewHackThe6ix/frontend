@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Nav, Navbar, NavItem, Jumbotron,
+  Nav, Navbar, NavItem, Jumbotron, NavbarBrand,
   Button, Modal, ModalHeader, ModalBody,
   Form, FormGroup, Input, Label
 } from 'reactstrap';
@@ -77,6 +77,10 @@ class Header extends Component {
       <div>
         <Navbar dark expand="md">
           <div className="container">
+            <NavbarBrand className="mr-auto" href="/">
+              <img src="assets/images/logo.png" height="30" width="41"
+                alt="BirdView" />
+            </NavbarBrand>
             <Nav className="ml-auto" navbar>
               <NavItem>
                 <Button outline onClick={this.toggleLoginModal}>

@@ -5,6 +5,7 @@ import {
 } from 'reactstrap';
 
 import { baseUrl } from '../shared/baseUrl';
+import { potentialMatchUrl } from '../shared/potentialMatchUrl';
 
 class Home extends Component {
   constructor(props) {
@@ -13,6 +14,9 @@ class Home extends Component {
     this.toggleReportModal = this.toggleReportModal.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFileChange = this.handleFileChange.bind(this);
+    this.handlePotentialMatchChange = this.handlePotentialMatchChange.bind(this);
+    this.togglePotentialMatchModal = this.togglePotentialMatchModal.bind(this);
+    this.handlePotentialMatchSubmit = this.handlePotentialMatchSubmit.bind(this);
 
     this.state = {
       isReportModalOpen: false,
@@ -22,12 +26,19 @@ class Home extends Component {
       height: '',
       lastSeenLocation: '',
       lastSeenTime: '',
-      other: ''
+      other: '',
+
+      isPotentialMatchOpen: false,
+      potentialMatchFile: null
     }
   }
 
   toggleReportModal() {
     this.setState({ isReportModalOpen: !this.state.isReportModalOpen });
+  }
+
+  togglePotentialMatchModal() {
+    this.setState({ isPotentialMatchOpen: !this.state.isPotentialMatchOpen });
   }
 
   handleReport(event) {
@@ -73,6 +84,37 @@ class Home extends Component {
     event.preventDefault();
   }
 
+  handlePotentialMatchSubmit(event) {
+    console.log('Potentail match submit');
+    var uploadData = new FormData()
+    uploadData.append('filename', this.state.potentialMatchFile.name);
+    uploadData.append('file', this.state.potentialMatchFile);
+
+    fetch(baseUrl + 'imageUpload', {
+      method: 'POST',
+      body: uploadData
+    })
+      .then(response => response.json())
+      .then((response) => {
+        fetch(potentialMatchUrl, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ imageUrl: response.Location })
+        })
+          .then(response => response.json())
+          .then(response => {
+            console.log(response);
+            alert('Thank you. We appreciate your help');
+          })
+      })
+      .catch(err => alert(err));
+
+    this.togglePotentialMatchModal();
+    event.preventDefault();
+  }
+
   handleInputChange(event) {
     const target = event.target;
     this.setState({
@@ -81,8 +123,16 @@ class Home extends Component {
   }
 
   handleFileChange(event) {
+    console.log('changing');
     this.setState({
       imageFile: event.target.files[0],
+    });
+  }
+
+  handlePotentialMatchChange(event) {
+    console.log('changing');
+    this.setState({
+      potentialMatchFile: event.target.files[0],
     });
   }
 
@@ -103,7 +153,7 @@ class Home extends Component {
             </Button>
           </div>
           <div className="col-12 col-md m-1">
-            <Button>
+            <Button onClick={this.togglePotentialMatchModal}>
               <Card body inverse color="success">
                 <CardTitle>Report a sighting/tip</CardTitle>
                 <CardText>If you think you may have spotted a missing child,
@@ -115,58 +165,76 @@ class Home extends Component {
           </div>
         </div>
 
-        <Modal isOpen={this.state.isReportModalOpen} toggle={this.toggleReportModal}>
-          <ModalHeader toggle={this.toggleReportModal}>Report a missing child</ModalHeader>
-          <ModalBody>
-            <Form onSubmit={this.handleReport}>
-              <FormGroup>
-                <Label htmlFor="imageFile">Image</Label>
-                <Input type="file" id="imageFile" name="imageFile"
-                  onChange={this.handleFileChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="name">Name</Label>
-                <Input type="text" id="name" name="name"
-                  value={this.state.name}
-                  onChange={this.handleInputChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="age">Age</Label>
-                <Input type="text" id="age" name="age"
-                  value={this.state.age}
-                  onChange={this.handleInputChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="height">Height</Label>
-                <Input type="text" id="height" name="height"
-                  value={this.state.height}
-                  onChange={this.handleInputChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="lastSeenLocation">Last seen location</Label>
-                <Input type="text" id="lastSeenLocation" name="lastSeenLocation"
-                  value={this.state.lastSeenLocation}
-                  onChange={this.handleInputChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="lastSeenTime">Last seen time</Label>
-                <Input type="text" id="lastSeenTime" name="lastSeenTime"
-                  value={this.state.lastSeenTime}
-                  onChange={this.handleInputChange} />
-              </FormGroup>
-              <FormGroup>
-                <Label htmlFor="other">Other info</Label>
-                <div className="col-12">
-                  <textarea id="other" name="other" rows={6}
-                    value={this.state.other}
+        <div className="row align-items-center">
+          <Modal isOpen={this.state.isReportModalOpen} toggle={this.toggleReportModal}>
+            <ModalHeader toggle={this.toggleReportModal}>Report a missing child</ModalHeader>
+            <ModalBody>
+              <Form onSubmit={this.handleReport}>
+                <FormGroup>
+                  <Label htmlFor="imageFile">Image</Label>
+                  <Input type="file" id="imageFile" name="imageFile"
+                    onChange={this.handleFileChange} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="name">Name</Label>
+                  <Input type="text" id="name" name="name"
+                    value={this.state.name}
                     onChange={this.handleInputChange} />
-                </div>
-              </FormGroup>
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="age">Age</Label>
+                  <Input type="text" id="age" name="age"
+                    value={this.state.age}
+                    onChange={this.handleInputChange} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="height">Height</Label>
+                  <Input type="text" id="height" name="height"
+                    value={this.state.height}
+                    onChange={this.handleInputChange} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="lastSeenLocation">Last seen location</Label>
+                  <Input type="text" id="lastSeenLocation" name="lastSeenLocation"
+                    value={this.state.lastSeenLocation}
+                    onChange={this.handleInputChange} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="lastSeenTime">Last seen time</Label>
+                  <Input type="text" id="lastSeenTime" name="lastSeenTime"
+                    value={this.state.lastSeenTime}
+                    onChange={this.handleInputChange} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="other">Other info</Label>
+                  <div className="col-12">
+                    <textarea id="other" name="other" rows={6}
+                      value={this.state.other}
+                      onChange={this.handleInputChange} />
+                  </div>
+                </FormGroup>
 
-              <Button type="submit" value="submit" color="primary">submit</Button>
-            </Form>
-          </ModalBody>
-        </Modal>
+                <Button type="submit" value="submit" color="primary">submit</Button>
+              </Form>
+            </ModalBody>
+          </Modal>
+        </div>
+
+        <div className="row align-items-center">
+          <Modal isOpen={this.state.isPotentialMatchOpen} toggle={this.togglePotentialMatchModal}>
+            <ModalHeader toggle={this.togglePotentialMatchModal}>Submit a picture of a potential missing kid</ModalHeader>
+            <ModalBody>
+              <Form onSubmit={this.handlePotentialMatchSubmit}>
+                <FormGroup>
+                  <Label htmlFor="potentialMatchFile">Image</Label>
+                  <Input type="file" id="potentialMatchFile" name="potentialMatchFile"
+                    onChange={this.handlePotentialMatchChange} />
+                </FormGroup>
+                <Button type="submit" value="submit" color="primary">submit</Button>
+              </Form>
+            </ModalBody>
+          </Modal>
+        </div>
 
       </div>
     );
