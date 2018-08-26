@@ -4,14 +4,25 @@ import {
   Form, FormGroup, Input, Label
 } from 'reactstrap';
 
+import { baseUrl } from '../shared/baseUrl';
+
 class Home extends Component {
   constructor(props) {
     super(props);
     this.handleReport = this.handleReport.bind(this);
     this.toggleReportModal = this.toggleReportModal.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleFileChange = this.handleFileChange.bind(this);
 
     this.state = {
-      isReportModalOpen: false
+      isReportModalOpen: false,
+      imageFile: null,
+      name: '',
+      age: '',
+      height: '',
+      lastSeenLocation: '',
+      lastSeenTime: '',
+      other: ''
     }
   }
 
@@ -20,9 +31,57 @@ class Home extends Component {
   }
 
   handleReport(event) {
+    var body = {
+      imageFile: this.state.imageFile,
+      name: this.state.name,
+      age: parseInt(this.state.age, 10),
+      height: parseInt(this.state.height, 10),
+      lastSeenLocation: this.state.lastSeenLocation,
+      lastSeenTime: this.state.lastSeenTime,
+      other: this.state.other
+    };
+
+    var uploadData = new FormData()
+    uploadData.append('imageFile', this.state.imageFile);
+
+    fetch(baseUrl + 'imageUpload', {
+      method: 'POST',
+      body: uploadData
+    })
+      .then(response => response.json())
+      .then((response) => {
+        let imageUrl = response.path;
+        body.imageUrl = imageUrl;
+        fetch(baseUrl + 'profiles', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        })
+          .then(response => response.json())
+          .then(response => {
+            console.log(response);
+            alert('Profile reported');
+          })
+      })
+      .catch(err => alert(err));
+
     this.toggleReportModal();
-    alert("Profile reported");
     event.preventDefault();
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    this.setState({
+      [target.name]: target.value
+    });
+  }
+
+  handleFileChange(event) {
+    this.setState({
+      imageFile: event.target.files[0],
+    });
   }
 
   render() {
@@ -59,36 +118,46 @@ class Home extends Component {
           <ModalBody>
             <Form onSubmit={this.handleReport}>
               <FormGroup>
+                <Label htmlFor="imageFile">Image</Label>
+                <Input type="file" id="imageFile" name="imageFile"
+                  onChange={this.handleFileChange} />
+              </FormGroup>
+              <FormGroup>
                 <Label htmlFor="name">Name</Label>
                 <Input type="text" id="name" name="name"
-                  innerRef={(input) => this.name = input} />
+                  value={this.state.name}
+                  onChange={this.handleInputChange} />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="age">Age</Label>
                 <Input type="text" id="age" name="age"
-                  innerRef={(input) => this.age = input} />
+                  value={this.state.age}
+                  onChange={this.handleInputChange} />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="height">Height</Label>
-                <Input type="text" id="height" name="heigth"
-                  innerRef={(input) => this.heigth = input} />
+                <Input type="text" id="height" name="height"
+                  value={this.state.height}
+                  onChange={this.handleInputChange} />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="lastSeenLocation">Last seen location</Label>
                 <Input type="text" id="lastSeenLocation" name="lastSeenLocation"
-                  innerRef={(input) => this.lastSeenLocation = input} />
+                  value={this.state.lastSeenLocation}
+                  onChange={this.handleInputChange} />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="lastSeenTime">Last seen time</Label>
                 <Input type="text" id="lastSeenTime" name="lastSeenTime"
-                  innerRef={(input) => this.lastSeenTime = input} />
+                  value={this.state.lastSeenTime}
+                  onChange={this.handleInputChange} />
               </FormGroup>
               <FormGroup>
                 <Label htmlFor="other">Other info</Label>
                 <div className="col-12">
                   <textarea id="other" name="other" rows={6}
-                    innerRef={(input) => this.other = input} />
-
+                    value={this.state.other}
+                    onChange={this.handleInputChange} />
                 </div>
               </FormGroup>
 

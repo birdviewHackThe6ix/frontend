@@ -4,6 +4,7 @@ import {
   Button, Modal, ModalHeader, ModalBody,
   Form, FormGroup, Input, Label
 } from 'reactstrap';
+import { baseUrl } from '../shared/baseUrl';
 
 class Header extends Component {
   constructor(props) {
@@ -24,8 +25,25 @@ class Header extends Component {
   }
 
   handleLogin(event) {
+    var body = {
+      username: this.username.value,
+      password: this.password.value
+    };
+    console.log(body);
+    fetch(baseUrl + 'users/login', {
+      method: "POST",
+      mode: 'no-cors',
+      headers: {
+        'Authorization': 'Basic Auth',
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify(body)
+    })
+      .then(response => response.json())
+      .then(response => alert(response.body))
+      .catch(err => alert('Incorrect username or password'));
+
     this.toggleLoginModal();
-    alert("Username: " + this.username.value + " Password: " + this.password.value);
     event.preventDefault();
   }
 
@@ -35,7 +53,22 @@ class Header extends Component {
 
   handleSignup(event) {
     this.toggleSignupModal();
-    alert("Username: " + this.username.value + " Password: " + this.password.value);
+    var body = {
+      username: this.username.value,
+      password: this.password.value,
+    };
+    fetch(baseUrl + 'users/signup', {
+      method: "POST",
+      mode: 'no-cors',
+      headers: {
+        'Authorization': 'Basic Auth',
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify(body)
+    })
+      .then(response => response.json())
+      .then(response => alert(response.body))
+      .catch(err => alert('Cannot sign up'));
     event.preventDefault();
   }
 
@@ -96,7 +129,7 @@ class Header extends Component {
           <ModalHeader toggle={this.toggleSignupModal}>Sign up</ModalHeader>
           <ModalBody>
             <Form onSubmit={this.handleSignup}>
-            <FormGroup>
+              <FormGroup>
                 <Label htmlFor="email">Email</Label>
                 <Input type="text" id="email" name="email"
                   innerRef={(input) => this.email = input} />
