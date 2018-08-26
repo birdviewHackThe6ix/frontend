@@ -9,7 +9,7 @@ function RenderMatchItem({ match }) {
   return (
     <Card key={match.id}>
       <a href={`${baseUrl}profiles/${match.missingId}`}>
-        <CardImg width="100%" src={baseUrl + match.imageUrl} alt={match.missingName} />
+        <CardImg width="100%" src={match.imageUrl} alt={match.missingName} />
         <CardImgOverlay>
           <CardTitle>{match.missingName}</CardTitle>
         </CardImgOverlay>

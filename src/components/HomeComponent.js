@@ -42,7 +42,8 @@ class Home extends Component {
     };
 
     var uploadData = new FormData()
-    uploadData.append('imageFile', this.state.imageFile);
+    uploadData.append('filename', this.state.imageFile.name);
+    uploadData.append('file', this.state.imageFile);
 
     fetch(baseUrl + 'imageUpload', {
       method: 'POST',
@@ -50,7 +51,8 @@ class Home extends Component {
     })
       .then(response => response.json())
       .then((response) => {
-        let imageUrl = response.path;
+        let imageUrl = response.Location;
+        console.log(imageUrl);
         body.imageUrl = imageUrl;
         fetch(baseUrl + 'profiles', {
           method: 'POST',
