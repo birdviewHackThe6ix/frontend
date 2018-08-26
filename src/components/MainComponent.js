@@ -12,8 +12,8 @@ class Main extends Component {
         <Header />
         <Switch>
           <Route path="/home" component={Home} />
-          {/* <Route path="/report" component={Report} />
-          <Route path="/journal" component={Journal} /> */}
+          {/* <Route path="/report" component={Report} /> */}
+          {/* <Route path="/matches" component={Matches} /> */}
           <Redirect to="/home" />
         </Switch>
         <Footer />
